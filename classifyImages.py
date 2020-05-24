@@ -16,6 +16,12 @@ Test will only be 10% of all the data
 #Csv with values for the dataset
 xray_data = pd.read_csv('D:\DescargasChrome\Data_Entry_2017.csv')
 
+regexList =['.*Atelectasis.*', '.*Consolidation.*', '.*Infiltration.*', '.*Pneumothorax.*', '.*Edema.*', '.*Emphysema.*', '.*Fibrosis.*',
+                    '.*Effusion.*', '.*Pneumonia.*', '.*Pleural_Thickening.*',
+                    '.*Cardiomegaly.*', '.*Nodule.*', '.*Mass.*', '.*Hernia.*']
+labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis',
+                    'Effusion', 'Pneumonia', 'Pleural_Thickening',
+                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
 #Arrays for images paths
 Atelectasis=[]
 Consolidation=[]
@@ -167,12 +173,12 @@ def fillDirectoryLabel(regex, label):
 
     for lval in range(len(labelsValidation)):
         print(labelsValidation[lval])
-        if re.search(regex,labelsTest[ltest]):  # regex
+        if re.search(regex,labelsValidation[lval]):  # regex
             listToAddValidation.append(imagePathValidation[lval])
 
     for ltrain in range(len(labelsTrain)):
         print(labelsTrain[ltrain])
-        if re.search(regex,labelsTest[ltest]):  # regex
+        if re.search(regex,labelsTrain[ltrain]):  # regex
             listToAddTrain.append(imagePathTrain[ltrain])
 
     print(len(listToAddTest), len(listToAddValidation), len(listToAddTrain))
@@ -189,5 +195,7 @@ def fillDirectoryLabel(regex, label):
         print(listToAddTrain[tr])
         copy(listToAddTrain[tr], os.path.join(r'D:\DescargasChrome\data\test',label))  # Directory+label
 
-
+for regex in range(len(regexList)):
+    print(regex)
+    fillDirectoryLabel(regexList[regex],labels[regex])
 print(xray_data)
