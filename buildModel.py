@@ -12,6 +12,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import RMSprop
+
 
 """
 Data parameters
@@ -22,11 +24,11 @@ Root directories for data
 
 image_width = 256
 image_height = 256
-batch_size = 16
+batch_size = 32
 epochs = 50
-nb_train_samples=len(pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\trainCsv.csv'))
-nb_validation_samples=len(pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\validationCsv.csv'))
-
+nb_train_samples = len(pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\trainCsv.csv'))
+nb_validation_samples = len(pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\validationCsv.csv'))
+print(nb_train_samples, nb_validation_samples)
 training_directory = r'D:\DescargasChrome\data\train'
 training_datagen = ImageDataGenerator(rescale=1. / 255,
                                       shear_range=0.2,
@@ -56,40 +58,39 @@ validation_generator = validation_datagen.flow_from_directory(validation_directo
                                                               target_size=(image_height, image_width))
 
 if image_data_format() == 'channels_first':
-    input_shape = (1, image_width, image_height) #1 means B&W images if it was RGB it will be 3
+    input_shape = (3, image_width, image_height)  # 1 means B&W images if it was RGB it will be 3
 else:
-    input_shape = (image_width, image_height, 1)
+    input_shape = (image_width, image_height, 3)
+
 
 def build_model():
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model = keras.models.Sequential()
 
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(256, 256, 3)),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dense(14, activation='softmax')
+    ])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=RMSprop(lr=0.001),
+                  metrics=['acc'])
 
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
-
-    model.compile(loss='binary_crossentropy',
-                  optimizer='rmsprop',
-                  metrics=['accuracy'])
-
-    model.fit_generator(
+    history = model.fit(
         training_generator,
-        steps_per_epoch=nb_train_samples // batch_size,
-        epochs=epochs,
+        steps_per_epoch=36,
+        epochs=100,
         validation_data=validation_generator,
-        validation_steps=nb_validation_samples // batch_size)
+        validation_steps=36
+    )
 
-    model.save_weights('first_try.h5')
+    model.save_weights('first_try_weights.h5')
+    model.save('first_try.h5')
+
+
+build_model()
