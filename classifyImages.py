@@ -65,11 +65,20 @@ def add_target_vector():
 
 add_target_vector()
 
+
 train, testValidation = train_test_split(xray_data, test_size=0.40, random_state=100)
 validation, test = train_test_split(testValidation, test_size=0.20, random_state=100)
 
 # train, validate, test = pd.np.split(xray_data, [int(.6 * (xray_data)), int(.8 * len(xray_data))])
 print(len(train), len(validation), len(test))
+"""
+Save Xray train test and validation dataframes as csv
+"""
+xray_data.to_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\xrayCsv.csv', sep=",", index=False)
+train.to_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\trainCsv.csv', sep=",", index=False)
+test.to_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\testCsv.csv', sep=",", index=False)
+validation.to_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\validationCsv.csv', sep=",", index=False)
+
 
 
 def create_labelled_dir():
@@ -98,56 +107,56 @@ create_labelled_dir()
 
 
 
-def fillAtelectasisLabel():
-    """
-    Si la finding label es Atelectasis entonces mover ese archivo desde su full path al nuevo path
-    """
-    labelsTest= test['Finding Labels'].tolist()
-    labelsValidation= validation['Finding Labels'].tolist()
-    labelsTrain= train['Finding Labels'].tolist()
-
-    #print(labels)
-    imagePathTest= test['FullPath'].tolist()
-    imagePathValidation = validation['FullPath'].tolist()
-    imagePathTrain = train['FullPath'].tolist()
-    listToAddTest = []
-    listToAddValidation = []
-    listToAddTrain = []
-
-    for i in range(len(labelsTest)):
-        print(labelsTest[i])
-        if labelsTest[i] == "Atelectasis": #regex
-            listToAddTest.append(imagePathTest[i])
-
-    for i in range(len(labelsValidation)):
-        print(labelsValidation[i])
-        if labelsValidation[i] == "Atelectasis": #regex
-            listToAddValidation.append(imagePathValidation[i])
-
-    for i in range(len(labelsTrain)):
-        print(labelsTrain[i])
-        if labelsTrain[i] == "Atelectasis": #regex
-            listToAddTrain.append(imagePathTrain[i])
-
-    print(len(listToAddTest), len(listToAddValidation), len(listToAddTrain))
-
-
-    for t in range(len(listToAddTest)):
-        print(listToAddTest[t])
-        copy(listToAddTest[t],r'D:\DescargasChrome\data\test\Atelectasis')#Directory+label
-
-    for v in range(len(listToAddValidation)):
-        print(listToAddValidation[v])
-        copy(listToAddValidation[v],r'D:\DescargasChrome\data\validation\Atelectasis')#Directory+label
-
-    for tr in range(len(listToAddTrain)):
-        print(listToAddTrain[tr])
-        copy(listToAddTrain[tr],r'D:\DescargasChrome\data\train\Atelectasis')#Directory+label
-
-
-
-
-fillAtelectasisLabel()
+# def fillAtelectasisLabel():
+#     """
+#     Si la finding label es Atelectasis entonces mover ese archivo desde su full path al nuevo path
+#     """
+#     labelsTest= test['Finding Labels'].tolist()
+#     labelsValidation= validation['Finding Labels'].tolist()
+#     labelsTrain= train['Finding Labels'].tolist()
+#
+#     #print(labels)
+#     imagePathTest= test['FullPath'].tolist()
+#     imagePathValidation = validation['FullPath'].tolist()
+#     imagePathTrain = train['FullPath'].tolist()
+#     listToAddTest = []
+#     listToAddValidation = []
+#     listToAddTrain = []
+#
+#     for i in range(len(labelsTest)):
+#         print(labelsTest[i])
+#         if labelsTest[i] == "Atelectasis": #regex
+#             listToAddTest.append(imagePathTest[i])
+#
+#     for i in range(len(labelsValidation)):
+#         print(labelsValidation[i])
+#         if labelsValidation[i] == "Atelectasis": #regex
+#             listToAddValidation.append(imagePathValidation[i])
+#
+#     for i in range(len(labelsTrain)):
+#         print(labelsTrain[i])
+#         if labelsTrain[i] == "Atelectasis": #regex
+#             listToAddTrain.append(imagePathTrain[i])
+#
+#     print(len(listToAddTest), len(listToAddValidation), len(listToAddTrain))
+#
+#
+#     for t in range(len(listToAddTest)):
+#         print(listToAddTest[t])
+#         copy(listToAddTest[t],r'D:\DescargasChrome\data\test\Atelectasis')#Directory+label
+#
+#     for v in range(len(listToAddValidation)):
+#         print(listToAddValidation[v])
+#         copy(listToAddValidation[v],r'D:\DescargasChrome\data\validation\Atelectasis')#Directory+label
+#
+#     for tr in range(len(listToAddTrain)):
+#         print(listToAddTrain[tr])
+#         copy(listToAddTrain[tr],r'D:\DescargasChrome\data\train\Atelectasis')#Directory+label
+#
+#
+#
+#
+# fillAtelectasisLabel()
 
 
 def fillDirectoryLabel(regex, label):
@@ -189,11 +198,11 @@ def fillDirectoryLabel(regex, label):
 
     for v in range(len(listToAddValidation)):
         print(listToAddValidation[v])
-        copy(listToAddValidation[v], os.path.join(r'D:\DescargasChrome\data\test',label))  # Directory+label
+        copy(listToAddValidation[v], os.path.join(r'D:\DescargasChrome\data\validation',label))  # Directory+label
 
     for tr in range(len(listToAddTrain)):
         print(listToAddTrain[tr])
-        copy(listToAddTrain[tr], os.path.join(r'D:\DescargasChrome\data\test',label))  # Directory+label
+        copy(listToAddTrain[tr], os.path.join(r'D:\DescargasChrome\data\train',label))  # Directory+label
 
 for regex in range(len(regexList)):
     print(regex)
