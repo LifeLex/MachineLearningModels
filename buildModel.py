@@ -24,9 +24,10 @@ Image Parameters
 Batch parameters
 Root directories for data
 """
-labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis',
-                    'Effusion', 'Pneumonia', 'Pleural_Thickening',
-                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+labels = ['Atelectasis', 'Consolidation', 'Infiltration',
+       'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis', 'Effusion',
+       'Pneumonia', 'Pleural_Thickening', 'Cardiomegaly', 'Nodule', 'Mass',
+       'Hernia']
 
 image_width = 256
 image_height = 256
@@ -75,10 +76,17 @@ test_generator = test_datagen.flow_from_dataframe(
     shuffle=True,
     class_mode="raw",
     target_size=(256, 256))
+# predictions=0.5
+# results=pd.DataFrame(predictions, columns=labels)
+# print("test")
+# results["Filenames"]=test_generator.filenames
+# ordered_cols=["Filenames"]+labels
+# results=results[ordered_cols]#To get the same column order
+# results.to_csv("results.csv",index=False)
 
 model = Sequential()
 model.add(Conv2D(32, (3, 3), padding='same',
-                 input_shape=(256,256,3)))
+                 input_shape=(256,256,3))) #change to 448x448x1
 model.add(Activation('relu'))
 model.add(Conv2D(32, (3, 3)))
 model.add(Activation('relu'))
@@ -91,7 +99,7 @@ model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 model.add(Flatten())
-model.add(Dense(512))
+model.add(Dense(128)) #512
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
 model.add(Dense(14, activation='sigmoid'))
@@ -101,30 +109,30 @@ model.compile(optimizers.rmsprop(lr=0.0001, decay=1e-6),loss="binary_crossentrop
 STEP_SIZE_TRAIN=train_generator.n//train_generator.batch_size
 STEP_SIZE_VALID=valid_generator.n//valid_generator.batch_size
 STEP_SIZE_TEST=test_generator.n//test_generator.batch_size
-csv_logger = CSVLogger('log.csv', append=True, separator=';')
+
 
 model.fit_generator(generator=train_generator,
                     steps_per_epoch=STEP_SIZE_TRAIN,
                     validation_data=valid_generator,
                     validation_steps=STEP_SIZE_VALID,
-                    epochs=10,
-                    callbacks=[csv_logger]
+                    epochs=1
 )
-model.save('modelo.h5')
+model.save('modelo2.h5')
 model_json= model.to_json()
-with open("model_num.json", "w") as json_file:
+with open("model_num2.json", "w") as json_file:
     json_file.write(model_json)
     
 test_generator.reset()
 pred=model.predict_generator(test_generator,
-steps=STEP_SIZE_TEST,
-verbose=1)
+    steps=STEP_SIZE_TEST,
+    verbose=1)
 pred_bool = (pred >0.5)
 
 predictions = pred_bool.astype(int)
 
 #columns should be the same order of y_col
 results=pd.DataFrame(predictions, columns=labels)
+print(len(test_generator.filenames))
 results["Image Index"]=test_generator.filenames
 ordered_cols=["FullPath"]+labels
 results=results[ordered_cols]#To get the same column order
