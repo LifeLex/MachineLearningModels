@@ -18,10 +18,10 @@ xray_data = pd.read_csv('D:\DescargasChrome\Data_Entry_2017.csv')
 
 regexList =['.*Atelectasis.*', '.*Consolidation.*', '.*Infiltration.*', '.*Pneumothorax.*', '.*Edema.*', '.*Emphysema.*', '.*Fibrosis.*',
                     '.*Effusion.*', '.*Pneumonia.*', '.*Pleural_Thickening.*',
-                    '.*Cardiomegaly.*', '.*Nodule.*', '.*Mass.*', '.*Hernia.*']
+                    '.*Cardiomegaly.*', '.*Nodule.*', '.*Mass.*', '.*Hernia.*', '.*No Finding.*']
 labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis',
                     'Effusion', 'Pneumonia', 'Pleural_Thickening',
-                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia', 'NoFinding']
 #Arrays for images paths
 Atelectasis=[]
 Consolidation=[]
@@ -37,6 +37,7 @@ Cardiomegaly=[]
 Nodule=[]
 Mass=[]
 Hernia=[]
+NoFinding=[]
 
 """
 Adds the path to the file to the data frame as a column called FullPath
@@ -56,7 +57,7 @@ Adds a vector of 0 or 1 values corresponding to the label if it's present or not
 def add_target_vector():
     dummy_labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis',
                     'Effusion', 'Pneumonia', 'Pleural_Thickening',
-                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+                    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia', 'NoFinding']
     for label in dummy_labels:
         xray_data[label] = xray_data['Finding Labels'].map(lambda result: 1.0 if label in result else 0)
 
@@ -84,21 +85,21 @@ validation.to_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\va
 def create_labelled_dir():
     parent_dir_test = r"D:\DescargasChrome\data\test"
     dummy_labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis', 'Effusion', 'Pneumonia', 'Pleural_Thickening',
-    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia', 'NoFinding']
     for i in dummy_labels:
         if not os.path.exists(os.path.join(parent_dir_test,i)):
             os.makedirs(os.path.join(parent_dir_test,i))
 
     parent_dir_train = r"D:\DescargasChrome\data\train"
     dummy_labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis', 'Effusion', 'Pneumonia', 'Pleural_Thickening',
-    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia', 'NoFinding']
     for i in dummy_labels:
         if not os.path.exists(os.path.join(parent_dir_train,i)):
             os.makedirs(os.path.join(parent_dir_train,i))
 
     parent_dir_train = r"D:\DescargasChrome\data\validation"
     dummy_labels = ['Atelectasis', 'Consolidation', 'Infiltration', 'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis', 'Effusion', 'Pneumonia', 'Pleural_Thickening',
-    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
+    'Cardiomegaly', 'Nodule', 'Mass', 'Hernia', 'NoFinding']
     for i in dummy_labels:
         if not os.path.exists(os.path.join(parent_dir_train,i)):
             os.makedirs(os.path.join(parent_dir_train,i))
