@@ -16,6 +16,10 @@ from keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import RMSprop
 from keras.optimizers import SGD
 from keras.callbacks import CSVLogger
+from keras.applications.mobilenet import MobileNet
+from keras.layers import GlobalAveragePooling2D, Dense, Dropout, Flatten
+from keras.models import Sequential
+from keras.layers import Input, Dense, Dropout, Flatten, Conv2D, MaxPool2D, BatchNormalization, Activation, concatenate
 
 
 """
@@ -76,67 +80,157 @@ test_generator = test_datagen.flow_from_dataframe(
     shuffle=True,
     class_mode="raw",
     target_size=(256, 256))
-# predictions=0.5
+
+model = Sequential()
+
+model.add(Conv2D(filters=32, kernel_size=(3, 3), padding='Same', activation='relu', input_shape=(256,256,1)))
+model.add(Conv2D(filters=32, kernel_size=(3, 3), padding='Same'))
+model.add(Conv2D(filters=32, kernel_size=(3, 3), padding='Same'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=128, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(Conv2D(filters=128, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=128, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(Conv2D(filters=128, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=256, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+model.add(Conv2D(filters=256, kernel_size=(3, 3), padding='Same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.1))
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+# dense block with activation function
+model.add(Flatten())
+model.add(Dense(128, activation="relu"))
+model.add(Dropout(0.5))
+model.add(Dense(len(labels), activation="sigmoid"))
+model.summary()
+
+
+
+
+
+# model = Sequential()
+# model.add(Conv2D(filters=16, kernel_size=(5, 5), activation="relu", input_shape=(256, 256, 1)))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Conv2D(filters=32, kernel_size=(5, 5), activation='relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Conv2D(filters=64, kernel_size=(5, 5), activation="relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Conv2D(filters=64, kernel_size=(5, 5), activation='relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Flatten())
+# model.add(Dense(128, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(14, activation='sigmoid'))
+# model.compile(optimizer='adam', loss='binary_crossentropy',
+#               metrics=['binary_accuracy', 'mae'])
+# model.summary()
+
+#Below the original model
+# model = Sequential()
+# model.add(Conv2D(32, (3, 3), padding='same',
+#                  input_shape=(256,256,3))) #change to 448x448x1
+# model.add(Activation('relu'))
+# model.add(Conv2D(32, (3, 3)))
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Conv2D(64, (3, 3), padding='same'))
+# model.add(Activation('relu'))
+# model.add(Conv2D(64, (3, 3)))
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.25))
+# model.add(Flatten())
+# model.add(Dense(128)) #512
+# model.add(Activation('relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(14, activation='sigmoid'))
+# model.summary()
+# model.compile(optimizers.rmsprop(lr=0.0001, decay=1e-6),loss="binary_crossentropy",metrics=["accuracy"])
+#
+# STEP_SIZE_TRAIN=train_generator.n//train_generator.batch_size
+# STEP_SIZE_VALID=valid_generator.n//valid_generator.batch_size
+# STEP_SIZE_TEST=test_generator.n//test_generator.batch_size
+#
+#
+# model.fit_generator(generator=train_generator,
+#                     steps_per_epoch=STEP_SIZE_TRAIN,
+#                     validation_data=valid_generator,
+#                     validation_steps=STEP_SIZE_VALID,
+#                     epochs=1
+# )
+# model.save('modelo2.h5')
+# model_json= model.to_json()
+# with open("model_num2.json", "w") as json_file:
+#     json_file.write(model_json)
+    
+# test_generator.reset()
+# pred=model.predict_generator(test_generator,
+#     steps=STEP_SIZE_TEST,
+#     verbose=1)
+# pred_bool = (pred >0.5)
+#
+# predictions = pred_bool.astype(int)
+#
+# #columns should be the same order of y_col
 # results=pd.DataFrame(predictions, columns=labels)
-# print("test")
-# results["Filenames"]=test_generator.filenames
-# ordered_cols=["Filenames"]+labels
+# print(len(test_generator.filenames))
+# results["Image Index"]=test_generator.filenames
+# ordered_cols=["FullPath"]+labels
 # results=results[ordered_cols]#To get the same column order
 # results.to_csv("results.csv",index=False)
 
-model = Sequential()
-model.add(Conv2D(32, (3, 3), padding='same',
-                 input_shape=(256,256,3))) #change to 448x448x1
-model.add(Activation('relu'))
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-model.add(Conv2D(64, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(128)) #512
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-model.add(Dense(14, activation='sigmoid'))
-model.summary()
-model.compile(optimizers.rmsprop(lr=0.0001, decay=1e-6),loss="binary_crossentropy",metrics=["accuracy"])
-
-STEP_SIZE_TRAIN=train_generator.n//train_generator.batch_size
-STEP_SIZE_VALID=valid_generator.n//valid_generator.batch_size
-STEP_SIZE_TEST=test_generator.n//test_generator.batch_size
 
 
-model.fit_generator(generator=train_generator,
-                    steps_per_epoch=STEP_SIZE_TRAIN,
-                    validation_data=valid_generator,
-                    validation_steps=STEP_SIZE_VALID,
-                    epochs=1
-)
-model.save('modelo2.h5')
-model_json= model.to_json()
-with open("model_num2.json", "w") as json_file:
-    json_file.write(model_json)
-    
-test_generator.reset()
-pred=model.predict_generator(test_generator,
-    steps=STEP_SIZE_TEST,
-    verbose=1)
-pred_bool = (pred >0.5)
 
-predictions = pred_bool.astype(int)
 
-#columns should be the same order of y_col
-results=pd.DataFrame(predictions, columns=labels)
-print(len(test_generator.filenames))
-results["Image Index"]=test_generator.filenames
-ordered_cols=["FullPath"]+labels
-results=results[ordered_cols]#To get the same column order
-results.to_csv("results.csv",index=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # training_directory = r'D:\DescargasChrome\data\train'
@@ -167,11 +261,37 @@ results.to_csv("results.csv",index=False)
 #                                                               class_mode='categorical',
 #                                                               target_size=(image_height, image_width))
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
 # if image_data_format() == 'channels_first':
 #     input_shape = (3, image_width, image_height)  # 1 means B&W images if it was RGB it will be 3
 # else:
 #     input_shape = (image_width, image_height, 3)
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # def build_model(): firs try this should be useful for multiclass but is multilabel
 #     model = keras.models.Sequential()
@@ -202,26 +322,5 @@ results.to_csv("results.csv",index=False)
 #     model.save_weights('first_try_weights.h5')
 #     model.save('first_try.h5')
 
-# def build_model():
-#     model = Sequential()
-#     model.add(Conv2D(32, (3, 3), padding='same',
-#                      input_shape=(256, 256, 3)))
-#     model.add(Activation('relu'))
-#     model.add(Conv2D(32, (3, 3)))
-#     model.add(Activation('relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2)))
-#     model.add(Dropout(0.25))
-#     model.add(Conv2D(64, (3, 3), padding='same'))
-#     model.add(Activation('relu'))
-#     model.add(Conv2D(64, (3, 3)))
-#     model.add(Activation('relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2)))
-#     model.add(Dropout(0.25))
-#     model.add(Flatten())
-#     model.add(Dense(512))
-#     model.add(Activation('relu'))
-#     model.add(Dropout(0.5))
-#     model.add(Dense(14, activation='sigmoid'))
-#     model.compile(optimizers.rmsprop(lr=0.0001, decay=1e-6), loss="binary_crossentropy", metrics=["accuracy"])
-#
-# build_model()
+
+

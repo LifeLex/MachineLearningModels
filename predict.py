@@ -23,11 +23,11 @@ dataframe_validation = pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\Machine
 dataframe_test = pd.read_csv(r'C:\Users\Alejandro\Documents\GitHub\MachineLearningModels\testCsv.csv')
 labels = ['Atelectasis', 'Consolidation', 'Infiltration',
        'Pneumothorax', 'Edema', 'Emphysema', 'Fibrosis', 'Effusion',
-       'Pneumonia', 'Pleural_Thickening', 'Cardiomegaly', 'Nodule', 'Mass',
-       'Hernia']
+       'Pneumonia', 'Pleural_Thickening', 'Cardiomegaly', 'Nodule', 'Mass', 'Hernia']
 test_datagen = ImageDataGenerator(rescale=1. / 255.)
 datagen = ImageDataGenerator(rescale=1. / 255.)
 train_generator = datagen.flow_from_dataframe(
+    color_mode='grayscale',
     dataframe=dataframe_train,
     directory="D:\DescargasChrome\input\images*\images",
     x_col="FullPath",
@@ -38,6 +38,7 @@ train_generator = datagen.flow_from_dataframe(
     class_mode="raw",
     target_size=(256, 256))
 valid_generator = test_datagen.flow_from_dataframe(
+    color_mode='grayscale',
     dataframe=dataframe_validation,
     directory="D:\DescargasChrome\input\images*\images",
     x_col="FullPath",
@@ -49,6 +50,7 @@ valid_generator = test_datagen.flow_from_dataframe(
     target_size=(256, 256))
 
 test_generator = test_datagen.flow_from_dataframe(
+    color_mode='grayscale',
     dataframe=dataframe_test,
     directory="D:\DescargasChrome\input\images*\images",
     x_col="FullPath",
@@ -62,12 +64,13 @@ STEP_SIZE_TRAIN=train_generator.n//train_generator.batch_size
 STEP_SIZE_VALID=valid_generator.n//valid_generator.batch_size
 STEP_SIZE_TEST=test_generator.n//test_generator.batch_size
 
-model = load_model('modelo.h5')
+model = load_model('modelo_NIH_Sigmoid21062020.h5')
 test_generator.reset()
 pred=model.predict_generator(test_generator,
 steps=STEP_SIZE_TEST,
 verbose=1)
-pred_bool = (pred >0.2)
+
+pred_bool = (pred >0.5)
 
 predictions = pred_bool.astype(int)
 
@@ -77,4 +80,4 @@ print(len(test_generator.filenames))
 results["FullPath"]=test_generator.filenames
 ordered_cols=["FullPath"]+labels
 results=results[ordered_cols]#To get the same column order
-results.to_csv("results.csv",index=False)
+results.to_csv("results1.csv",index=False)
